@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+
+#
+# run cmd in background
+$1 &
+#
+# get its pid
+CMD_PID=$!
+printf "started cmd ($CMD_PID)\n\t$1\n\twith pid:\n"
+# watch -n$2
+LOCK_FILE=/tmp/in_use
+while true
+do
+    if [ -n "$(ps -p $CMD_PID -o pid=)" ]; then
+        if test -f "$LOCK_FILE"; then
+            kill -STOP $CMD_PID
+        else
+            kill -CONT $CMD_PID
+        fi
+        sleep $2
+    else
+        break
+    fi
+done
